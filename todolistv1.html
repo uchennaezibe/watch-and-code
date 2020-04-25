@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <title>Practical JS!!!</title>
+  </head>
+
+  <body>
+    <h1>Uchenna's Todo List (v1)!</h1>
+
+    <div>
+      <br>
+      <button onclick='handlers.addTodo()'>Add Todo</button>
+      <input id='addTodoTextInput' type='text'>
+    </div>
+    
+    <div>
+      <br>
+      <button onclick='handlers.changeTodo()'>Change Todo</button>
+      <input id='changeTodoPositionInput' type='number'>
+      <input id='changeTodoTextInput' type='text'>
+    </div>
+    
+    <div>
+      <br>
+      <button onclick='handlers.toggleCompleted()'>Toggle Todo</button>
+      <input id='toggleCompletedInput' type='number'>
+    </div>
+
+    <div>
+      <br>
+      <button onclick='handlers.toggleAll()'>Toggle All Todos</button>
+    </div>
+
+    <ul>
+    </ul>
+
+    <script>
+      var todosList = {
+        todos: [], 
+        addTodo: function(todoText) {
+          this.todos.push({
+            todoText: todoText,
+            completed: false
+          });
+        },
+        changeTodo: function(position, todoText) {
+          this.todos[position].todoText = todoText;
+        },
+        deleteTodo: function(position) {
+          this.todos.splice(position, 1);
+        },
+        toggleCompleted: function(position) {
+          var todo = this.todos[position];
+          todo.completed = !todo.completed;
+        },
+        toggleAll: function() {
+          var totalTodos = this.todos.length;
+          var completedTodos = 0;
+          this.todos.forEach(function(todo) {
+            if (todo.completed === true) {
+              completedTodos++;
+            }
+          });  
+          this.todos.forEach(function(todo) {
+            if (completedTodos === totalTodos) {
+              todo.completed = false;
+            } else {
+              todo.completed = true;
+            }
+          });
+        }
+      };
+
+    var handlers = {
+      addTodo: function() {
+       var addTodoTextInput = document.getElementById('addTodoTextInput');
+       todosList.addTodo(addTodoTextInput.value);
+       addTodoTextInput.value = '';
+       view.displayTodos();
+      },
+      changeTodo: function() {
+        var changeTodoPositionInput = document.getElementById('changeTodoPositionInput');
+        var changeTodoTextInput = document.getElementById('changeTodoTextInput');
+        todosList.changeTodo(changeTodoPositionInput.valueAsNumber, changeTodoTextInput.value);
+        changeTodoPositionInput.value = '';
+        changeTodoTextInput.value = '';
+        view.displayTodos();
+      },
+      deleteTodo: function(position) {
+        todosList.deleteTodo(position);
+        view.displayTodos();
+      },
+      toggleCompleted: function() {
+        var toggleCompletedInput = document.getElementById('toggleCompletedInput');
+        todosList.toggleCompleted(toggleCompletedInput.valueAsNumber);
+        toggleCompletedInput.value = '';
+        view.displayTodos();
+      },
+      toggleAll: function() {
+        todosList.toggleAll();
+        view.displayTodos();
+      }
+    };
+
+    var view = {
+      displayTodos: function() {
+        var todosUL = document.querySelector('ul');
+        todosUL.innerHTML = '';
+        todosList.todos.forEach(function(todo, position) {
+          var todoLi = document.createElement('li');
+          var todoTextWithCompletion = '';
+          if (todo.completed === true) {
+            todoTextWithCompletion = '(x) ' + todo.todoText;
+          } else {
+            todoTextWithCompletion = '( ) ' + todo.todoText;
+          }
+          todoLi.id = position;
+          todoLi.textContent = todoTextWithCompletion;
+          todoLi.appendChild(this.createDeleteButton());
+          todosUL.appendChild(todoLi);
+        }, this);
+      },
+      createDeleteButton: function() {
+        var deleteButton = document.createElement('button');
+        deleteButton.textContent = 'Delete';
+        deleteButton.className = 'deleteButton';
+        return deleteButton;
+      }, 
+      setUpEventListeners: function() {
+        
+        var todosUl = document.querySelector('ul');
+        todosUl.addEventListener('click', function(event) {
+          var elementClicked = event.target;
+
+          if (elementClicked.className === 'deleteButton') {
+            handlers.deleteTodo(parseInt(elementClicked.parentNode.id));    
+          }
+        });
+      }
+    };
+
+    view.setUpEventListeners();
+    </script>
+  </body>
+</html>
